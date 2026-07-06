@@ -1,0 +1,15 @@
+project:
+  name: quant-lab
+  environment: development
+
+paths:
+  data_raw: data/raw
+  data_interim: data/interim
+  data_processed: data/processed
+  data_features: data/features
+  reports: reports
+  logs: logs
+
+logging:
+  level: INFO
+  format: structured

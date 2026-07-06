@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+secrets/
+*.key
+*.pem
+
+# Data
+data/raw/*
+data/interim/*
+data/processed/*
+data/features/*
+data/lake/*
+!data/**/.gitkeep
+
+# Logs and reports
+logs/*
+reports/*
+!logs/.gitkeep
+!reports/.gitkeep
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
