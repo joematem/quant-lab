@@ -16,6 +16,7 @@ dependencies = [
     "pandas>=3.0.3",
     "polars>=1.42.1",
     "psycopg[binary]>=3.3.4",
+    "pyarrow>=24.0.0",
     "pydantic>=2.13.4",
     "pydantic-settings>=2.14.2",
     "pytest>=9.1.1",
@@ -27,6 +28,7 @@ dependencies = [
     "sqlalchemy>=2.0.51",
     "statsmodels>=0.14.6",
     "typer>=0.26.8",
+    "yfinance>=1.5.1",
 ]
 
 [project.scripts]
