@@ -49,7 +49,9 @@ def main(
         sweep.to_csv(output_path, index=False)
 
         console.print(
-            f"[bold green]SMA parameter sweep complete for {ticker.upper()}[/bold green]"
+            "[bold green]"
+            f"SMA parameter sweep complete for {ticker.upper()}"
+            "[/bold green]"
         )
         console.print(sweep.head(10))
         console.print(f"Saved sweep results: {output_path}")
