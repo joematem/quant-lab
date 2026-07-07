@@ -74,3 +74,38 @@ def plot_drawdowns(
     plt.close(fig)
 
     return output_path
+
+
+def plot_strategy_comparison(
+    comparison: pd.DataFrame,
+    output_path: Path,
+) -> Path:
+    """Plot strategy versus benchmark cumulative returns."""
+    required_columns = {"strategy", "date", "cumulative_return"}
+    missing = required_columns - set(comparison.columns)
+    if missing:
+        raise ValueError(f"Missing required columns: {sorted(missing)}")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    for strategy, group in comparison.groupby("strategy"):
+        ordered = group.sort_values("date")
+        ax.plot(
+            ordered["date"],
+            ordered["cumulative_return"],
+            label=strategy,
+        )
+
+    ax.set_title("Strategy Comparison: SMA Crossover vs Buy-and-Hold")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Cumulative Return")
+    ax.legend()
+    ax.grid(True)
+
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+
+    return output_path
