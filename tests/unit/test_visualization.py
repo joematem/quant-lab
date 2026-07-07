@@ -84,3 +84,37 @@ def test_plot_strategy_comparison_rejects_missing_columns(tmp_path: Path):
 
     with pytest.raises(ValueError, match="Missing required columns"):
         plot_strategy_comparison(bad_data, tmp_path / "bad.png")
+
+
+def test_plot_multi_ticker_strategy_comparison_creates_file(tmp_path: Path):
+    comparison = pd.DataFrame(
+        {
+            "ticker": ["AAPL", "AAPL", "MSFT", "MSFT"],
+            "strategy": [
+                "buy_and_hold",
+                "sma_crossover",
+                "buy_and_hold",
+                "sma_crossover",
+            ],
+            "date": pd.to_datetime(
+                ["2024-01-01", "2024-01-01", "2024-01-01", "2024-01-01"]
+            ),
+            "cumulative_return": [0.02, 0.01, 0.03, 0.015],
+        }
+    )
+
+    output_path = tmp_path / "multi_ticker_comparison.png"
+
+    result = plot_multi_ticker_strategy_comparison(comparison, output_path)
+
+    assert result.exists()
+    assert result.suffix == ".png"
+
+
+def test_plot_multi_ticker_strategy_comparison_rejects_missing_columns(
+    tmp_path: Path,
+):
+    bad_data = pd.DataFrame({"ticker": ["AAPL"]})
+
+    with pytest.raises(ValueError, match="Missing required columns"):
+        plot_multi_ticker_strategy_comparison(bad_data, tmp_path / "bad.png")

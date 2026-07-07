@@ -109,3 +109,41 @@ def plot_strategy_comparison(
     plt.close(fig)
 
     return output_path
+
+
+def plot_multi_ticker_strategy_comparison(
+    comparison: pd.DataFrame,
+    output_path: Path,
+) -> Path:
+    """Plot multi-ticker strategy comparison using cumulative returns."""
+    required_columns = {"ticker", "strategy", "date", "cumulative_return"}
+    missing = required_columns - set(comparison.columns)
+    if missing:
+        raise ValueError(f"Missing required columns: {sorted(missing)}")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    plot_data = comparison.copy()
+    plot_data["label"] = plot_data["ticker"] + " - " + plot_data["strategy"]
+
+    fig, ax = plt.subplots(figsize=(14, 8))
+
+    for label, group in plot_data.groupby("label"):
+        ordered = group.sort_values("date")
+        ax.plot(
+            ordered["date"],
+            ordered["cumulative_return"],
+            label=label,
+        )
+
+    ax.set_title("Multi-Ticker Strategy Comparison: SMA vs Buy-and-Hold")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Cumulative Return")
+    ax.legend()
+    ax.grid(True)
+
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+
+    return output_path
