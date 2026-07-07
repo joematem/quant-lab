@@ -6,6 +6,7 @@ import pytest
 from quantlab.visualization import (
     plot_cumulative_returns,
     plot_drawdowns,
+    plot_multi_ticker_strategy_comparison,
     plot_strategy_comparison,
 )
 
