@@ -55,7 +55,9 @@ def main(
     summary.to_csv(summary_path, index=False)
 
     console.print(
-        "[bold green]Multi-ticker SMA versus buy-and-hold comparison complete[/bold green]"
+        "[bold green]"
+        "Multi-ticker SMA versus buy-and-hold comparison complete"
+        "[/bold green]"
     )
     console.print(summary)
     console.print(f"Saved comparison: {comparison_path}")
