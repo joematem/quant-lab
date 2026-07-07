@@ -1,0 +1,76 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import pandas as pd
+
+
+def plot_cumulative_returns(
+    cumulative_returns: pd.DataFrame,
+    output_path: Path,
+) -> Path:
+    """Plot cumulative returns by ticker and save chart."""
+    required_columns = {"ticker", "date", "cumulative_return"}
+    missing = required_columns - set(cumulative_returns.columns)
+    if missing:
+        raise ValueError(f"Missing required columns: {sorted(missing)}")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    for ticker, group in cumulative_returns.groupby("ticker"):
+        ordered = group.sort_values("date")
+        ax.plot(
+            ordered["date"],
+            ordered["cumulative_return"],
+            label=ticker,
+        )
+
+    ax.set_title("Cumulative Returns")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Cumulative Return")
+    ax.legend()
+    ax.grid(True)
+
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+
+    return output_path
+
+
+def plot_drawdowns(
+    drawdowns: pd.DataFrame,
+    output_path: Path,
+) -> Path:
+    """Plot drawdowns by ticker and save chart."""
+    required_columns = {"ticker", "date", "drawdown"}
+    missing = required_columns - set(drawdowns.columns)
+    if missing:
+        raise ValueError(f"Missing required columns: {sorted(missing)}")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    for ticker, group in drawdowns.groupby("ticker"):
+        ordered = group.sort_values("date")
+        ax.plot(
+            ordered["date"],
+            ordered["drawdown"],
+            label=ticker,
+        )
+
+    ax.set_title("Drawdowns")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Drawdown")
+    ax.legend()
+    ax.grid(True)
+
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+
+    return output_path
