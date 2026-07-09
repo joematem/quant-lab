@@ -184,3 +184,43 @@ def plot_walk_forward_metric(
     plt.close(fig)
 
     return output_path
+
+
+def plot_portfolio_strategy_comparison(
+    portfolio_returns: pd.DataFrame,
+    output_path: Path,
+) -> Path:
+    """Plot portfolio-level cumulative returns by strategy."""
+    required_columns = {"ticker", "date", "adj_close"}
+    missing = required_columns - set(portfolio_returns.columns)
+    if missing:
+        raise ValueError(f"Missing required columns: {sorted(missing)}")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    df = portfolio_returns.copy()
+    df["date"] = pd.to_datetime(df["date"])
+
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    for strategy, group in df.groupby("ticker"):
+        ordered = group.sort_values("date")
+        cumulative_return = ordered["adj_close"] / ordered["adj_close"].iloc[0] - 1.0
+
+        ax.plot(
+            ordered["date"],
+            cumulative_return,
+            label=strategy,
+        )
+
+    ax.set_title("Equal-Weight Portfolio Strategy Comparison")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Cumulative return")
+    ax.legend()
+    ax.grid(True)
+
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+
+    return output_path
