@@ -211,3 +211,19 @@ def test_create_sma_research_report_includes_transaction_cost_stress(
     assert "Transaction cost stress test" in text
     assert "transaction_cost_bps" in text
     assert "sharpe_ratio_decay" in text
+
+
+def test_create_sma_research_report_lists_transaction_cost_charts(
+    tmp_path: Path,
+):
+    output_path = tmp_path / "sma_research_report.md"
+
+    result = create_sma_research_report(
+        walk_forward_summary=sample_walk_forward_summary(),
+        output_path=output_path,
+    )
+
+    text = result.read_text()
+
+    assert "transaction_cost_stress_sharpe.png" in text
+    assert "transaction_cost_stress_total_return_decay.png" in text

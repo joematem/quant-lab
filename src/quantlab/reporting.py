@@ -350,6 +350,8 @@ The following charts were generated locally:
 - `reports/backtests/figures/multi_ticker_sma_vs_buy_hold.png`
 - `reports/backtests/figures/portfolio_equal_weight_comparison.png`
 - `reports/backtests/figures/portfolio_volatility_targeted_comparison.png`
+- `reports/backtests/figures/transaction_cost_stress_sharpe.png`
+- `reports/backtests/figures/transaction_cost_stress_total_return_decay.png`
 
 ## 10. Limitations
 
