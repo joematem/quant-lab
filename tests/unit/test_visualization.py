@@ -8,6 +8,7 @@ from quantlab.visualization import (
     plot_drawdowns,
     plot_multi_ticker_strategy_comparison,
     plot_strategy_comparison,
+    plot_walk_forward_metric,
 )
 
 
@@ -119,3 +120,35 @@ def test_plot_multi_ticker_strategy_comparison_rejects_missing_columns(
 
     with pytest.raises(ValueError, match="Missing required columns"):
         plot_multi_ticker_strategy_comparison(bad_data, tmp_path / "bad.png")
+
+
+def test_plot_walk_forward_metric_creates_file(tmp_path: Path):
+    walk_forward_results = pd.DataFrame(
+        {
+            "ticker": ["AAPL", "AAPL", "MSFT", "MSFT"],
+            "test_start_year": [2020, 2021, 2020, 2021],
+            "test_sharpe_ratio": [1.0, 0.5, -0.2, 1.2],
+        }
+    )
+
+    output_path = tmp_path / "walk_forward_sharpe.png"
+
+    result = plot_walk_forward_metric(
+        walk_forward_results,
+        metric="test_sharpe_ratio",
+        output_path=output_path,
+    )
+
+    assert result.exists()
+    assert result.suffix == ".png"
+
+
+def test_plot_walk_forward_metric_rejects_missing_columns(tmp_path: Path):
+    bad_data = pd.DataFrame({"ticker": ["AAPL"]})
+
+    with pytest.raises(ValueError, match="Missing required columns"):
+        plot_walk_forward_metric(
+            bad_data,
+            metric="test_sharpe_ratio",
+            output_path=tmp_path / "bad.png",
+        )

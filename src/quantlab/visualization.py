@@ -147,3 +147,40 @@ def plot_multi_ticker_strategy_comparison(
     plt.close(fig)
 
     return output_path
+
+
+def plot_walk_forward_metric(
+    walk_forward_results: pd.DataFrame,
+    metric: str,
+    output_path: Path,
+) -> Path:
+    """Plot a walk-forward metric over test years by ticker."""
+    required_columns = {"ticker", "test_start_year", metric}
+    missing = required_columns - set(walk_forward_results.columns)
+    if missing:
+        raise ValueError(f"Missing required columns: {sorted(missing)}")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    for ticker, group in walk_forward_results.groupby("ticker"):
+        ordered = group.sort_values("test_start_year")
+        ax.plot(
+            ordered["test_start_year"],
+            ordered[metric],
+            marker="o",
+            label=ticker,
+        )
+
+    ax.set_title(f"Walk-Forward {metric.replace('_', ' ').title()}")
+    ax.set_xlabel("Test start year")
+    ax.set_ylabel(metric.replace("_", " ").title())
+    ax.legend()
+    ax.grid(True)
+
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+
+    return output_path
