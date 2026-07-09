@@ -28,6 +28,9 @@ portfolio:
 	uv run python scripts/run_equal_weight_portfolio_backtest.py
 	uv run python scripts/create_portfolio_charts.py
 
+risk:
+	uv run python scripts/run_portfolio_volatility_targeting.py --target-annual-volatility 0.15 --lookback-days 63 --max-leverage 1.0
+
 sync-check:
 	git status
 	git branch -vv
