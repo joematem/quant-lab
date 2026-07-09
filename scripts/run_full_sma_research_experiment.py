@@ -165,6 +165,16 @@ def main(
     )
 
     run_step(
+        "Running equal-weight portfolio backtest",
+        ["scripts/run_equal_weight_portfolio_backtest.py"],
+    )
+
+    run_step(
+        "Creating portfolio charts",
+        ["scripts/create_portfolio_charts.py"],
+    )
+
+    run_step(
         "Creating SMA research report",
         [
             "scripts/create_sma_research_report.py",

@@ -24,6 +24,10 @@ report:
 charts:
 	uv run python scripts/create_walk_forward_charts.py AAPL MSFT NVDA --train-years 3 --test-years 1 --transaction-cost-bps 5
 
+portfolio:
+	uv run python scripts/run_equal_weight_portfolio_backtest.py
+	uv run python scripts/create_portfolio_charts.py
+
 sync-check:
 	git status
 	git branch -vv
