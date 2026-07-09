@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: quantlab-check
+        name: QuantLab quality gate
+        entry: make check
+        language: system
+        pass_filenames: false
