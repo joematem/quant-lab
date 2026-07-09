@@ -193,6 +193,11 @@ def main(
     )
 
     run_step(
+        "Creating portfolio strategy comparison",
+        ["scripts/create_portfolio_strategy_comparison.py"],
+    )
+
+    run_step(
         "Creating SMA research report",
         [
             "scripts/create_sma_research_report.py",
