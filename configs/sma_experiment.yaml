@@ -1,0 +1,17 @@
+sma_experiment:
+  tickers:
+    - AAPL
+    - MSFT
+    - NVDA
+
+  data:
+    start: "2015-01-01"
+
+  strategy:
+    short_window: 20
+    long_window: 50
+    transaction_cost_bps: 5.0
+
+  validation:
+    train_years: 3
+    test_years: 1
