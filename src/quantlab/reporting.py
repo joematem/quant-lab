@@ -7,11 +7,17 @@ import pandas as pd
 
 def format_percentage(value: float) -> str:
     """Format decimal value as percentage."""
+    if pd.isna(value):
+        return "N/A"
+
     return f"{value:.2%}"
 
 
 def format_float(value: float) -> str:
     """Format float for reports."""
+    if pd.isna(value):
+        return "N/A"
+
     return f"{value:.4f}"
 
 
