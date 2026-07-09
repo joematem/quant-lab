@@ -60,10 +60,18 @@ def main(
     reports_dir.mkdir(parents=True, exist_ok=True)
 
     portfolio_summary_path = reports_dir / "portfolio_equal_weight_summary.csv"
-    portfolio_summary = None
+    targeted_summary_path = reports_dir / "portfolio_volatility_targeted_summary.csv"
+    portfolio_summaries = []
 
     if portfolio_summary_path.exists():
-        portfolio_summary = pd.read_csv(portfolio_summary_path)
+        portfolio_summaries.append(pd.read_csv(portfolio_summary_path))
+
+    if targeted_summary_path.exists():
+        portfolio_summaries.append(pd.read_csv(targeted_summary_path))
+
+    portfolio_summary = None
+    if portfolio_summaries:
+        portfolio_summary = pd.concat(portfolio_summaries, ignore_index=True)
 
     report_path = reports_dir / "sma_research_report.md"
     create_sma_research_report(

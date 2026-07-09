@@ -76,8 +76,15 @@ def _format_portfolio_summary(portfolio_summary: pd.DataFrame) -> pd.DataFrame:
         "max_drawdown",
     ]
 
-    if "average_asset_count" in portfolio_summary.columns:
-        display_columns.append("average_asset_count")
+    optional_columns = [
+        "average_asset_count",
+        "average_volatility_scale",
+        "average_realised_annual_volatility",
+    ]
+
+    for column in optional_columns:
+        if column in portfolio_summary.columns:
+            display_columns.append(column)
 
     display_summary = portfolio_summary[display_columns].copy()
 
@@ -86,10 +93,14 @@ def _format_portfolio_summary(portfolio_summary: pd.DataFrame) -> pd.DataFrame:
 
     display_summary["sharpe_ratio"] = display_summary["sharpe_ratio"].map(format_float)
 
-    if "average_asset_count" in display_summary.columns:
-        display_summary["average_asset_count"] = display_summary[
-            "average_asset_count"
-        ].map(format_float)
+    for column in ["average_asset_count", "average_volatility_scale"]:
+        if column in display_summary.columns:
+            display_summary[column] = display_summary[column].map(format_float)
+
+    if "average_realised_annual_volatility" in display_summary.columns:
+        display_summary["average_realised_annual_volatility"] = display_summary[
+            "average_realised_annual_volatility"
+        ].map(format_percentage)
 
     return display_summary
 

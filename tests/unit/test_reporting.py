@@ -79,3 +79,38 @@ def test_create_sma_research_report_rejects_missing_columns(tmp_path: Path):
             bad_data,
             tmp_path / "bad_report.md",
         )
+
+
+def test_create_sma_research_report_includes_volatility_targeted_summary(
+    tmp_path: Path,
+):
+    output_path = tmp_path / "sma_research_report.md"
+
+    targeted_summary = pd.DataFrame(
+        {
+            "ticker": ["equal_weight_sma_vol_targeted"],
+            "total_return": [0.8],
+            "annualized_return": [0.09],
+            "sharpe_ratio": [0.75],
+            "max_drawdown": [-0.14],
+            "average_volatility_scale": [0.82],
+            "average_realised_annual_volatility": [0.19],
+        }
+    )
+
+    portfolio_summary = pd.concat(
+        [sample_portfolio_summary(), targeted_summary],
+        ignore_index=True,
+    )
+
+    result = create_sma_research_report(
+        walk_forward_summary=sample_walk_forward_summary(),
+        output_path=output_path,
+        portfolio_summary=portfolio_summary,
+    )
+
+    text = result.read_text()
+
+    assert "equal_weight_sma_vol_targeted" in text
+    assert "average_volatility_scale" in text
+    assert "average_realised_annual_volatility" in text
