@@ -30,6 +30,7 @@ portfolio:
 
 risk:
 	uv run python scripts/run_portfolio_volatility_targeting.py --target-annual-volatility 0.15 --lookback-days 63 --max-leverage 1.0
+	uv run python scripts/create_volatility_targeting_charts.py
 
 sync-check:
 	git status
