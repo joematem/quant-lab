@@ -59,8 +59,18 @@ def main(
     reports_dir = project_path("reports", "backtests")
     reports_dir.mkdir(parents=True, exist_ok=True)
 
+    portfolio_summary_path = reports_dir / "portfolio_equal_weight_summary.csv"
+    portfolio_summary = None
+
+    if portfolio_summary_path.exists():
+        portfolio_summary = pd.read_csv(portfolio_summary_path)
+
     report_path = reports_dir / "sma_research_report.md"
-    create_sma_research_report(summary, report_path)
+    create_sma_research_report(
+        walk_forward_summary=summary,
+        output_path=report_path,
+        portfolio_summary=portfolio_summary,
+    )
 
     console.print("[bold green]SMA research report complete[/bold green]")
     console.print(f"Saved report: {report_path}")

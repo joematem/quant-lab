@@ -24,6 +24,19 @@ def sample_walk_forward_summary() -> pd.DataFrame:
     )
 
 
+def sample_portfolio_summary() -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            "ticker": ["equal_weight_buy_hold", "equal_weight_sma"],
+            "total_return": [1.5, 1.1],
+            "annualized_return": [0.12, 0.10],
+            "sharpe_ratio": [0.9, 0.8],
+            "max_drawdown": [-0.25, -0.18],
+            "average_asset_count": [3.0, 3.0],
+        }
+    )
+
+
 def test_create_sma_research_report_creates_markdown_file(tmp_path: Path):
     output_path = tmp_path / "sma_research_report.md"
 
@@ -38,6 +51,24 @@ def test_create_sma_research_report_creates_markdown_file(tmp_path: Path):
     text = result.read_text()
     assert "SMA Crossover Strategy Research Report" in text
     assert "Walk-forward robustness summary" in text
+
+
+def test_create_sma_research_report_includes_portfolio_summary(
+    tmp_path: Path,
+):
+    output_path = tmp_path / "sma_research_report.md"
+
+    result = create_sma_research_report(
+        walk_forward_summary=sample_walk_forward_summary(),
+        output_path=output_path,
+        portfolio_summary=sample_portfolio_summary(),
+    )
+
+    text = result.read_text()
+
+    assert "Portfolio-level summary" in text
+    assert "equal_weight_sma" in text
+    assert "equal_weight_buy_hold" in text
 
 
 def test_create_sma_research_report_rejects_missing_columns(tmp_path: Path):
