@@ -198,6 +198,34 @@ def main(
     )
 
     run_step(
+        "Running transaction cost stress test",
+        [
+            "scripts/run_transaction_cost_stress_test.py",
+            *ticker_args,
+            "--short-window",
+            str(short_window),
+            "--long-window",
+            str(long_window),
+            "--costs-bps",
+            "5,10,25,50",
+        ],
+    )
+
+    run_step(
+        "Running transaction cost stress test",
+        [
+            "scripts/run_transaction_cost_stress_test.py",
+            *ticker_args,
+            "--short-window",
+            str(short_window),
+            "--long-window",
+            str(long_window),
+            "--costs-bps",
+            "5,10,25,50",
+        ],
+    )
+
+    run_step(
         "Creating SMA research report",
         [
             "scripts/create_sma_research_report.py",

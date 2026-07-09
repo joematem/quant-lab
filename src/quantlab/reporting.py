@@ -140,9 +140,7 @@ def _format_portfolio_strategy_ranking(ranking: pd.DataFrame) -> pd.DataFrame:
         "average_realised_annual_volatility",
     ]
 
-    display_columns = [
-        column for column in display_columns if column in ranking.columns
-    ]
+    display_columns = [column for column in display_columns if column in ranking]
 
     display_ranking = ranking[display_columns].copy()
 
@@ -172,11 +170,61 @@ def _format_portfolio_strategy_ranking(ranking: pd.DataFrame) -> pd.DataFrame:
     return display_ranking
 
 
+def _format_transaction_cost_stress(stress: pd.DataFrame) -> pd.DataFrame:
+    required_columns = {
+        "ticker",
+        "transaction_cost_bps",
+        "total_return",
+        "annualized_return",
+        "sharpe_ratio",
+        "max_drawdown",
+        "total_return_decay",
+        "sharpe_ratio_decay",
+    }
+
+    missing = required_columns - set(stress.columns)
+    if missing:
+        raise ValueError(f"Missing cost stress columns: {sorted(missing)}")
+
+    display_columns = [
+        "ticker",
+        "transaction_cost_bps",
+        "total_return",
+        "annualized_return",
+        "sharpe_ratio",
+        "max_drawdown",
+        "total_return_decay",
+        "sharpe_ratio_decay",
+    ]
+
+    display_stress = stress[display_columns].copy()
+
+    percentage_columns = [
+        "total_return",
+        "annualized_return",
+        "max_drawdown",
+        "total_return_decay",
+    ]
+
+    for column in percentage_columns:
+        display_stress[column] = display_stress[column].map(format_percentage)
+
+    for column in [
+        "transaction_cost_bps",
+        "sharpe_ratio",
+        "sharpe_ratio_decay",
+    ]:
+        display_stress[column] = display_stress[column].map(format_float)
+
+    return display_stress
+
+
 def create_sma_research_report(
     walk_forward_summary: pd.DataFrame,
     output_path: Path,
     portfolio_summary: pd.DataFrame | None = None,
     portfolio_strategy_ranking: pd.DataFrame | None = None,
+    transaction_cost_stress: pd.DataFrame | None = None,
 ) -> Path:
     """Create a Markdown research report for the SMA strategy."""
     required_columns = {
@@ -221,6 +269,15 @@ def create_sma_research_report(
         display_ranking = _format_portfolio_strategy_ranking(portfolio_strategy_ranking)
         ranking_section = dataframe_to_markdown(display_ranking)
 
+    cost_stress_section = (
+        "Transaction cost stress results were not available when this report "
+        "was generated."
+    )
+
+    if transaction_cost_stress is not None:
+        display_cost_stress = _format_transaction_cost_stress(transaction_cost_stress)
+        cost_stress_section = dataframe_to_markdown(display_cost_stress)
+
     report = f"""# SMA Crossover Strategy Research Report
 
 ## 1. Strategy overview
@@ -254,6 +311,8 @@ The workflow included:
 7. Walk-forward validation using rolling train/test periods.
 8. Robustness summary across tickers.
 9. Equal-weight portfolio backtesting.
+10. Volatility targeting.
+11. Transaction cost stress testing.
 
 ## 4. Walk-forward robustness summary
 
@@ -267,7 +326,11 @@ The workflow included:
 
 {ranking_section}
 
-## 7. Main finding
+## 7. Transaction cost stress test
+
+{cost_stress_section}
+
+## 8. Main finding
 
 Based on mean walk-forward Sharpe ratio, the strongest ticker in this test
 was **{best_ticker}**.
@@ -277,7 +340,7 @@ are not perfectly stable across time.
 
 This suggests that the strategy may be sensitive to market regime changes.
 
-## 8. Charts generated
+## 9. Charts generated
 
 The following charts were generated locally:
 
@@ -286,8 +349,9 @@ The following charts were generated locally:
 - `reports/backtests/figures/walk_forward_selected_long_window.png`
 - `reports/backtests/figures/multi_ticker_sma_vs_buy_hold.png`
 - `reports/backtests/figures/portfolio_equal_weight_comparison.png`
+- `reports/backtests/figures/portfolio_volatility_targeted_comparison.png`
 
-## 9. Limitations
+## 10. Limitations
 
 This research is still preliminary.
 
@@ -297,26 +361,23 @@ Important limitations:
 - Only three large-cap technology stocks were tested.
 - The strategy is long-only.
 - No liquidity model beyond simple transaction costs is included.
-- No volatility targeting is included.
 - No advanced portfolio construction layer is included.
 - No live execution layer is included.
 - No statistical significance testing is included yet.
 - No survivorship-bias-free universe is used.
 
-## 10. Next research steps
+## 11. Next research steps
 
 Recommended next steps:
 
-1. Add volatility targeting.
-2. Add benchmark-relative metrics.
-3. Add Monte Carlo robustness testing.
-4. Add train/test equity curve charts.
-5. Add portfolio-level risk limits.
-6. Add experiment tracking.
-7. Add reproducible report generation from one command.
-8. Add MetaTrader deployment only after stronger validation.
+1. Add cost stress visualisation.
+2. Add Monte Carlo robustness testing.
+3. Add train/test equity curve charts.
+4. Add portfolio-level risk limits.
+5. Add experiment tracking.
+6. Add MetaTrader deployment only after stronger validation.
 
-## 11. Research conclusion
+## 12. Research conclusion
 
 The SMA crossover strategy shows some positive walk-forward evidence,
 especially for the strongest-ranked ticker.

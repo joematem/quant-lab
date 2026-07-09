@@ -61,6 +61,7 @@ def main(
 
     portfolio_summary_path = reports_dir / "portfolio_equal_weight_summary.csv"
     targeted_summary_path = reports_dir / "portfolio_volatility_targeted_summary.csv"
+
     portfolio_summaries = []
 
     if portfolio_summary_path.exists():
@@ -79,12 +80,19 @@ def main(
     if ranking_path.exists():
         portfolio_strategy_ranking = pd.read_csv(ranking_path)
 
+    cost_stress_path = reports_dir / "transaction_cost_stress_summary.csv"
+    transaction_cost_stress = None
+
+    if cost_stress_path.exists():
+        transaction_cost_stress = pd.read_csv(cost_stress_path)
+
     report_path = reports_dir / "sma_research_report.md"
     create_sma_research_report(
         walk_forward_summary=summary,
         output_path=report_path,
         portfolio_summary=portfolio_summary,
         portfolio_strategy_ranking=portfolio_strategy_ranking,
+        transaction_cost_stress=transaction_cost_stress,
     )
 
     console.print("[bold green]SMA research report complete[/bold green]")

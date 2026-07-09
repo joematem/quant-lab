@@ -180,3 +180,34 @@ def test_create_sma_research_report_displays_missing_values_as_na(
 
     assert "nan%" not in text
     assert "n/a" in text
+
+
+def test_create_sma_research_report_includes_transaction_cost_stress(
+    tmp_path: Path,
+):
+    output_path = tmp_path / "sma_research_report.md"
+
+    stress = pd.DataFrame(
+        {
+            "ticker": ["AAPL", "AAPL"],
+            "transaction_cost_bps": [5.0, 25.0],
+            "total_return": [1.0, 0.8],
+            "annualized_return": [0.15, 0.12],
+            "sharpe_ratio": [0.75, 0.60],
+            "max_drawdown": [-0.20, -0.22],
+            "total_return_decay": [0.0, -0.2],
+            "sharpe_ratio_decay": [0.0, -0.15],
+        }
+    )
+
+    result = create_sma_research_report(
+        walk_forward_summary=sample_walk_forward_summary(),
+        output_path=output_path,
+        transaction_cost_stress=stress,
+    )
+
+    text = result.read_text()
+
+    assert "Transaction cost stress test" in text
+    assert "transaction_cost_bps" in text
+    assert "sharpe_ratio_decay" in text
