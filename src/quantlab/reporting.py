@@ -105,10 +105,72 @@ def _format_portfolio_summary(portfolio_summary: pd.DataFrame) -> pd.DataFrame:
     return display_summary
 
 
+def _format_portfolio_strategy_ranking(ranking: pd.DataFrame) -> pd.DataFrame:
+    required_columns = {
+        "rank",
+        "ticker",
+        "total_return",
+        "annualized_return",
+        "sharpe_ratio",
+        "max_drawdown",
+        "return_to_drawdown",
+    }
+
+    missing = required_columns - set(ranking.columns)
+    if missing:
+        raise ValueError(f"Missing portfolio ranking columns: {sorted(missing)}")
+
+    display_columns = [
+        "rank",
+        "ticker",
+        "total_return",
+        "annualized_return",
+        "annualized_volatility",
+        "sharpe_ratio",
+        "max_drawdown",
+        "return_to_drawdown",
+        "average_asset_count",
+        "average_volatility_scale",
+        "average_realised_annual_volatility",
+    ]
+
+    display_columns = [
+        column for column in display_columns if column in ranking.columns
+    ]
+
+    display_ranking = ranking[display_columns].copy()
+
+    percentage_columns = [
+        "total_return",
+        "annualized_return",
+        "annualized_volatility",
+        "max_drawdown",
+        "average_realised_annual_volatility",
+    ]
+
+    for column in percentage_columns:
+        if column in display_ranking.columns:
+            display_ranking[column] = display_ranking[column].map(format_percentage)
+
+    float_columns = [
+        "sharpe_ratio",
+        "return_to_drawdown",
+        "average_asset_count",
+        "average_volatility_scale",
+    ]
+
+    for column in float_columns:
+        if column in display_ranking.columns:
+            display_ranking[column] = display_ranking[column].map(format_float)
+
+    return display_ranking
+
+
 def create_sma_research_report(
     walk_forward_summary: pd.DataFrame,
     output_path: Path,
     portfolio_summary: pd.DataFrame | None = None,
+    portfolio_strategy_ranking: pd.DataFrame | None = None,
 ) -> Path:
     """Create a Markdown research report for the SMA strategy."""
     required_columns = {
@@ -143,6 +205,15 @@ def create_sma_research_report(
     if portfolio_summary is not None:
         display_portfolio_summary = _format_portfolio_summary(portfolio_summary)
         portfolio_section = dataframe_to_markdown(display_portfolio_summary)
+
+    ranking_section = (
+        "Portfolio strategy ranking was not available when this report was "
+        "generated."
+    )
+
+    if portfolio_strategy_ranking is not None:
+        display_ranking = _format_portfolio_strategy_ranking(portfolio_strategy_ranking)
+        ranking_section = dataframe_to_markdown(display_ranking)
 
     report = f"""# SMA Crossover Strategy Research Report
 
@@ -186,7 +257,11 @@ The workflow included:
 
 {portfolio_section}
 
-## 6. Main finding
+## 6. Portfolio strategy ranking
+
+{ranking_section}
+
+## 7. Main finding
 
 Based on mean walk-forward Sharpe ratio, the strongest ticker in this test
 was **{best_ticker}**.
@@ -196,7 +271,7 @@ are not perfectly stable across time.
 
 This suggests that the strategy may be sensitive to market regime changes.
 
-## 7. Charts generated
+## 8. Charts generated
 
 The following charts were generated locally:
 
@@ -206,7 +281,7 @@ The following charts were generated locally:
 - `reports/backtests/figures/multi_ticker_sma_vs_buy_hold.png`
 - `reports/backtests/figures/portfolio_equal_weight_comparison.png`
 
-## 8. Limitations
+## 9. Limitations
 
 This research is still preliminary.
 
@@ -222,7 +297,7 @@ Important limitations:
 - No statistical significance testing is included yet.
 - No survivorship-bias-free universe is used.
 
-## 9. Next research steps
+## 10. Next research steps
 
 Recommended next steps:
 
@@ -235,7 +310,7 @@ Recommended next steps:
 7. Add reproducible report generation from one command.
 8. Add MetaTrader deployment only after stronger validation.
 
-## 10. Research conclusion
+## 11. Research conclusion
 
 The SMA crossover strategy shows some positive walk-forward evidence,
 especially for the strongest-ranked ticker.

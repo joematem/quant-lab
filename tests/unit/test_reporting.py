@@ -114,3 +114,35 @@ def test_create_sma_research_report_includes_volatility_targeted_summary(
     assert "equal_weight_sma_vol_targeted" in text
     assert "average_volatility_scale" in text
     assert "average_realised_annual_volatility" in text
+
+
+def test_create_sma_research_report_includes_portfolio_strategy_ranking(
+    tmp_path: Path,
+):
+    output_path = tmp_path / "sma_research_report.md"
+
+    ranking = pd.DataFrame(
+        {
+            "rank": [1, 2],
+            "ticker": ["equal_weight_buy_hold", "equal_weight_sma"],
+            "total_return": [4.0, 1.0],
+            "annualized_return": [0.30, 0.18],
+            "annualized_volatility": [0.25, 0.20],
+            "sharpe_ratio": [1.2, 0.9],
+            "max_drawdown": [-0.40, -0.30],
+            "return_to_drawdown": [10.0, 3.33],
+        }
+    )
+
+    result = create_sma_research_report(
+        walk_forward_summary=sample_walk_forward_summary(),
+        output_path=output_path,
+        portfolio_summary=sample_portfolio_summary(),
+        portfolio_strategy_ranking=ranking,
+    )
+
+    text = result.read_text()
+
+    assert "Portfolio strategy ranking" in text
+    assert "return_to_drawdown" in text
+    assert "equal_weight_buy_hold" in text

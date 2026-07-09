@@ -73,11 +73,18 @@ def main(
     if portfolio_summaries:
         portfolio_summary = pd.concat(portfolio_summaries, ignore_index=True)
 
+    ranking_path = reports_dir / "portfolio_strategy_comparison_summary.csv"
+    portfolio_strategy_ranking = None
+
+    if ranking_path.exists():
+        portfolio_strategy_ranking = pd.read_csv(ranking_path)
+
     report_path = reports_dir / "sma_research_report.md"
     create_sma_research_report(
         walk_forward_summary=summary,
         output_path=report_path,
         portfolio_summary=portfolio_summary,
+        portfolio_strategy_ranking=portfolio_strategy_ranking,
     )
 
     console.print("[bold green]SMA research report complete[/bold green]")
