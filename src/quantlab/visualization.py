@@ -224,3 +224,42 @@ def plot_portfolio_strategy_comparison(
     plt.close(fig)
 
     return output_path
+
+
+def plot_transaction_cost_stress(
+    stress_results: pd.DataFrame,
+    metric: str,
+    output_path: Path,
+) -> Path:
+    """Plot transaction cost stress results by ticker."""
+    required_columns = {"ticker", "transaction_cost_bps", metric}
+    missing = required_columns - set(stress_results.columns)
+    if missing:
+        raise ValueError(f"Missing required columns: {sorted(missing)}")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    df = stress_results.copy()
+    df = df.sort_values(["ticker", "transaction_cost_bps"])
+
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    for ticker, group in df.groupby("ticker"):
+        ax.plot(
+            group["transaction_cost_bps"],
+            group[metric],
+            marker="o",
+            label=ticker,
+        )
+
+    ax.set_title(f"Transaction Cost Stress: {metric.replace('_', ' ').title()}")
+    ax.set_xlabel("Transaction cost, basis points")
+    ax.set_ylabel(metric.replace("_", " ").title())
+    ax.legend()
+    ax.grid(True)
+
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+
+    return output_path

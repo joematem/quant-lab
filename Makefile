@@ -37,6 +37,7 @@ portfolio-comparison:
 
 cost-stress:
 	uv run python scripts/run_transaction_cost_stress_test.py AAPL MSFT NVDA --short-window 20 --long-window 50 --costs-bps 5,10,25,50
+	uv run python scripts/create_transaction_cost_stress_charts.py
 
 sync-check:
 	git status

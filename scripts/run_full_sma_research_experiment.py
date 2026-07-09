@@ -212,6 +212,11 @@ def main(
     )
 
     run_step(
+        "Creating transaction cost stress charts",
+        ["scripts/create_transaction_cost_stress_charts.py"],
+    )
+
+    run_step(
         "Running transaction cost stress test",
         [
             "scripts/run_transaction_cost_stress_test.py",
@@ -223,6 +228,11 @@ def main(
             "--costs-bps",
             "5,10,25,50",
         ],
+    )
+
+    run_step(
+        "Creating transaction cost stress charts",
+        ["scripts/create_transaction_cost_stress_charts.py"],
     )
 
     run_step(
