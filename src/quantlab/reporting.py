@@ -84,8 +84,10 @@ def create_sma_research_report(
 
 This report evaluates a simple long-only moving-average crossover strategy.
 
-The strategy enters a long position when the short moving average is above the long moving average. 
-Signals are shifted by one trading day to reduce look-ahead bias. Transaction costs are included.
+The strategy enters a long position when the short moving average is above
+the long moving average. 
+Signals are shifted by one trading day to reduce look-ahead bias.
+Transaction costs are included.
 
 ## 2. Instruments tested
 
@@ -114,9 +116,11 @@ The workflow included:
 
 ## 5. Main finding
 
-Based on mean walk-forward Sharpe ratio, the strongest ticker in this test was **{best_ticker}**.
+Based on mean walk-forward Sharpe ratio, the strongest ticker in this test
+was **{best_ticker}**.
 
-However, the parameter change counts show that the selected SMA windows are not perfectly stable across time. 
+However, the parameter change counts show that the selected SMA windows
+are not perfectly stable across time. 
 This suggests that the strategy may be sensitive to market regime changes.
 
 ## 6. Charts generated
@@ -159,10 +163,13 @@ Recommended next steps:
 
 ## 9. Research conclusion
 
-The SMA crossover strategy shows some positive walk-forward evidence, especially for the strongest-ranked ticker. 
+The SMA crossover strategy shows some positive walk-forward evidence,
+especially for the strongest-ranked ticker. 
 However, the evidence is not sufficient for live deployment.
 
-The correct conclusion is: continue research, improve robustness testing, and avoid live trading until the system includes stronger risk controls and broader validation.
+The correct conclusion is: continue research, improve robustness testing,
+and avoid live trading until the system includes stronger risk controls
+and broader validation.
 """
 
     output_path.write_text(report)
