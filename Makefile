@@ -53,3 +53,7 @@ clean-pyc:
 	find . -type d -name ".pytest_cache" -prune -exec rm -rf {} +
 	find . -type d -name ".ruff_cache" -prune -exec rm -rf {} +
 	find . -type d -name ".mypy_cache" -prune -exec rm -rf {} +
+
+manifest:
+	uv run python scripts/create_experiment_manifest.py
+
