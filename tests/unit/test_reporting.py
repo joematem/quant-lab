@@ -227,3 +227,57 @@ def test_create_sma_research_report_lists_transaction_cost_charts(
 
     assert "transaction_cost_stress_sharpe.png" in text
     assert "transaction_cost_stress_total_return_decay.png" in text
+
+
+def test_create_sma_research_report_includes_monte_carlo_summary(
+    tmp_path: Path,
+):
+    output_path = tmp_path / "sma_research_report.md"
+
+    monte_carlo_summary = pd.DataFrame(
+        {
+            "ticker": ["equal_weight_sma_monte_carlo"],
+            "simulations": [1000],
+            "total_return_p05": [-0.20],
+            "total_return_p50": [0.50],
+            "total_return_p95": [1.50],
+            "sharpe_ratio_p05": [-0.30],
+            "sharpe_ratio_p50": [0.70],
+            "sharpe_ratio_p95": [1.40],
+            "max_drawdown_p05": [-0.50],
+            "max_drawdown_p50": [-0.30],
+            "max_drawdown_p95": [-0.10],
+            "probability_positive_return": [0.85],
+            "probability_negative_return": [0.15],
+            "probability_drawdown_worse_than_30pct": [0.54],
+        }
+    )
+
+    result = create_sma_research_report(
+        walk_forward_summary=sample_walk_forward_summary(),
+        output_path=output_path,
+        monte_carlo_summary=monte_carlo_summary,
+    )
+
+    text = result.read_text()
+
+    assert "Monte Carlo robustness summary" in text
+    assert "equal_weight_sma_monte_carlo" in text
+    assert "probability_drawdown_worse_than_30pct" in text
+
+
+def test_create_sma_research_report_lists_monte_carlo_charts(
+    tmp_path: Path,
+):
+    output_path = tmp_path / "sma_research_report.md"
+
+    result = create_sma_research_report(
+        walk_forward_summary=sample_walk_forward_summary(),
+        output_path=output_path,
+    )
+
+    text = result.read_text()
+
+    assert "monte_carlo_total_return_distribution.png" in text
+    assert "monte_carlo_max_drawdown_distribution.png" in text
+    assert "monte_carlo_sharpe_distribution.png" in text

@@ -219,12 +219,79 @@ def _format_transaction_cost_stress(stress: pd.DataFrame) -> pd.DataFrame:
     return display_stress
 
 
+def _format_monte_carlo_summary(summary: pd.DataFrame) -> pd.DataFrame:
+    required_columns = {
+        "ticker",
+        "simulations",
+        "total_return_p05",
+        "total_return_p50",
+        "total_return_p95",
+        "sharpe_ratio_p05",
+        "sharpe_ratio_p50",
+        "sharpe_ratio_p95",
+        "max_drawdown_p05",
+        "max_drawdown_p50",
+        "max_drawdown_p95",
+        "probability_positive_return",
+        "probability_negative_return",
+        "probability_drawdown_worse_than_30pct",
+    }
+
+    missing = required_columns - set(summary.columns)
+    if missing:
+        raise ValueError(f"Missing Monte Carlo summary columns: {sorted(missing)}")
+
+    display_columns = [
+        "ticker",
+        "simulations",
+        "total_return_p05",
+        "total_return_p50",
+        "total_return_p95",
+        "sharpe_ratio_p05",
+        "sharpe_ratio_p50",
+        "sharpe_ratio_p95",
+        "max_drawdown_p05",
+        "max_drawdown_p50",
+        "max_drawdown_p95",
+        "probability_positive_return",
+        "probability_negative_return",
+        "probability_drawdown_worse_than_30pct",
+    ]
+
+    display_summary = summary[display_columns].copy()
+
+    percentage_columns = [
+        "total_return_p05",
+        "total_return_p50",
+        "total_return_p95",
+        "max_drawdown_p05",
+        "max_drawdown_p50",
+        "max_drawdown_p95",
+        "probability_positive_return",
+        "probability_negative_return",
+        "probability_drawdown_worse_than_30pct",
+    ]
+
+    for column in percentage_columns:
+        display_summary[column] = display_summary[column].map(format_percentage)
+
+    for column in [
+        "sharpe_ratio_p05",
+        "sharpe_ratio_p50",
+        "sharpe_ratio_p95",
+    ]:
+        display_summary[column] = display_summary[column].map(format_float)
+
+    return display_summary
+
+
 def create_sma_research_report(
     walk_forward_summary: pd.DataFrame,
     output_path: Path,
     portfolio_summary: pd.DataFrame | None = None,
     portfolio_strategy_ranking: pd.DataFrame | None = None,
     transaction_cost_stress: pd.DataFrame | None = None,
+    monte_carlo_summary: pd.DataFrame | None = None,
 ) -> Path:
     """Create a Markdown research report for the SMA strategy."""
     required_columns = {
@@ -278,6 +345,15 @@ def create_sma_research_report(
         display_cost_stress = _format_transaction_cost_stress(transaction_cost_stress)
         cost_stress_section = dataframe_to_markdown(display_cost_stress)
 
+    monte_carlo_section = (
+        "Monte Carlo robustness results were not available when this report "
+        "was generated."
+    )
+
+    if monte_carlo_summary is not None:
+        display_monte_carlo = _format_monte_carlo_summary(monte_carlo_summary)
+        monte_carlo_section = dataframe_to_markdown(display_monte_carlo)
+
     report = f"""# SMA Crossover Strategy Research Report
 
 ## 1. Strategy overview
@@ -330,7 +406,11 @@ The workflow included:
 
 {cost_stress_section}
 
-## 8. Main finding
+## 8. Monte Carlo robustness summary
+
+{monte_carlo_section}
+
+## 9. Main finding
 
 Based on mean walk-forward Sharpe ratio, the strongest ticker in this test
 was **{best_ticker}**.
@@ -340,7 +420,7 @@ are not perfectly stable across time.
 
 This suggests that the strategy may be sensitive to market regime changes.
 
-## 9. Charts generated
+## 10. Charts generated
 
 The following charts were generated locally:
 
@@ -352,8 +432,11 @@ The following charts were generated locally:
 - `reports/backtests/figures/portfolio_volatility_targeted_comparison.png`
 - `reports/backtests/figures/transaction_cost_stress_sharpe.png`
 - `reports/backtests/figures/transaction_cost_stress_total_return_decay.png`
+- `reports/backtests/figures/monte_carlo_total_return_distribution.png`
+- `reports/backtests/figures/monte_carlo_max_drawdown_distribution.png`
+- `reports/backtests/figures/monte_carlo_sharpe_distribution.png`
 
-## 10. Limitations
+## 11. Limitations
 
 This research is still preliminary.
 
@@ -368,7 +451,7 @@ Important limitations:
 - No statistical significance testing is included yet.
 - No survivorship-bias-free universe is used.
 
-## 11. Next research steps
+## 12. Next research steps
 
 Recommended next steps:
 
@@ -379,7 +462,7 @@ Recommended next steps:
 5. Add experiment tracking.
 6. Add MetaTrader deployment only after stronger validation.
 
-## 12. Research conclusion
+## 13. Research conclusion
 
 The SMA crossover strategy shows some positive walk-forward evidence,
 especially for the strongest-ranked ticker.

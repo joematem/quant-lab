@@ -86,6 +86,12 @@ def main(
     if cost_stress_path.exists():
         transaction_cost_stress = pd.read_csv(cost_stress_path)
 
+    monte_carlo_path = reports_dir / "monte_carlo_portfolio_summary.csv"
+    monte_carlo_summary = None
+
+    if monte_carlo_path.exists():
+        monte_carlo_summary = pd.read_csv(monte_carlo_path)
+
     report_path = reports_dir / "sma_research_report.md"
     create_sma_research_report(
         walk_forward_summary=summary,
@@ -93,6 +99,7 @@ def main(
         portfolio_summary=portfolio_summary,
         portfolio_strategy_ranking=portfolio_strategy_ranking,
         transaction_cost_stress=transaction_cost_stress,
+        monte_carlo_summary=monte_carlo_summary,
     )
 
     console.print("[bold green]SMA research report complete[/bold green]")
