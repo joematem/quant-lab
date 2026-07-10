@@ -60,3 +60,6 @@ manifest:
 dashboard:
 	uv run python scripts/create_research_dashboard.py
 
+decision-gate:
+	uv run python scripts/create_strategy_decision_gate.py
+
