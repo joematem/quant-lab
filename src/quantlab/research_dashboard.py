@@ -15,6 +15,14 @@ def load_manifest(manifest_path: Path) -> dict[str, Any]:
     return json.loads(manifest_path.read_text())
 
 
+def load_optional_json(path: Path) -> dict[str, Any] | None:
+    """Load JSON file if it exists."""
+    if not path.exists():
+        return None
+
+    return json.loads(path.read_text())
+
+
 def format_output_status(path: Path) -> str:
     """Return Markdown status for a local output file."""
     if path.exists():
@@ -42,6 +50,10 @@ def create_research_dashboard(
         reports_dir / "portfolio_volatility_targeted_summary.csv",
         reports_dir / "transaction_cost_stress_summary.csv",
         reports_dir / "monte_carlo_portfolio_summary.csv",
+        reports_dir / "strategy_decision_gate.md",
+        reports_dir / "strategy_decision_gate.json",
+        reports_dir / "risk_limits_report.md",
+        reports_dir / "risk_limits_report.json",
     ]
 
     chart_files = [
@@ -59,6 +71,41 @@ def create_research_dashboard(
     ]
 
     parameters = manifest.get("parameters", {})
+
+    decision_gate = load_optional_json(reports_dir / "strategy_decision_gate.json")
+    risk_limits = load_optional_json(reports_dir / "risk_limits_report.json")
+
+    decision_value = (
+        decision_gate.get("decision", "not available")
+        if decision_gate is not None
+        else "not available"
+    )
+    decision_paper_allowed = (
+        decision_gate.get("paper_trading_allowed", "not available")
+        if decision_gate is not None
+        else "not available"
+    )
+    decision_live_allowed = (
+        decision_gate.get("live_trading_allowed", "not available")
+        if decision_gate is not None
+        else "not available"
+    )
+
+    risk_status = (
+        risk_limits.get("research_status", "not available")
+        if risk_limits is not None
+        else "not available"
+    )
+    risk_paper_allowed = (
+        risk_limits.get("paper_trading_allowed", "not available")
+        if risk_limits is not None
+        else "not available"
+    )
+    risk_live_allowed = (
+        risk_limits.get("live_trading_allowed", "not available")
+        if risk_limits is not None
+        else "not available"
+    )
 
     report_rows = "\n".join(
         f"| `{path}` | {format_output_status(path)} |" for path in report_files
@@ -93,8 +140,11 @@ Current phase status:
 | Monte Carlo robustness testing | complete |
 | Research report | complete |
 | Experiment manifest | complete |
-| Strategy decision gate | pending |
-| MT5 paper-trading prototype | not started |
+| Strategy decision gate | `{decision_value}` |
+| Risk limits | `{risk_status}` |
+| Paper trading | blocked |
+| Live trading | prohibited |
+| MT5 paper-trading prototype | blocked |
 
 ## 2. Experiment identity
 
@@ -123,7 +173,18 @@ Current phase status:
 |---|---|
 {chart_rows}
 
-## 6. Current research interpretation
+## 6. Decision gate and risk limits
+
+| Field | Value |
+|---|---|
+| Strategy decision | `{decision_value}` |
+| Decision gate paper trading allowed | `{decision_paper_allowed}` |
+| Decision gate live trading allowed | `{decision_live_allowed}` |
+| Risk limits status | `{risk_status}` |
+| Risk limits paper trading allowed | `{risk_paper_allowed}` |
+| Risk limits live trading allowed | `{risk_live_allowed}` |
+
+## 7. Current research interpretation
 
 The current strategy research is useful but not approved for live trading.
 
@@ -133,15 +194,15 @@ bootstrap simulation.
 
 This means the correct next step is a formal decision gate, not live deployment.
 
-## 7. Next step
+## 8. Next step
 
-Proceed to Step 39: strategy decision gate.
+This SMA research phase should now be closed.
 
-The strategy should be classified as one of:
+The strategy decision gate and risk limits both block paper trading.
 
-1. Reject.
-2. Continue research.
-3. Approve for paper trading only.
+The correct next research direction is to improve or replace the strategy
+inside the research environment before any MT5 paper-trading specification is
+created.
 
 Live trading remains out of scope.
 """
