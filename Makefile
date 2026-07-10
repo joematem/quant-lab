@@ -66,3 +66,6 @@ decision-gate:
 risk-limits:
 	uv run python scripts/create_risk_limits_report.py
 
+vol-filtered-sma:
+	uv run python scripts/run_volatility_filtered_sma_backtest.py AAPL MSFT NVDA --short-window 20 --long-window 50 --volatility-lookback 63 --max-annualized-volatility 0.40 --transaction-cost-bps 5
+
