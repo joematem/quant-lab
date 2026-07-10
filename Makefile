@@ -57,3 +57,6 @@ clean-pyc:
 manifest:
 	uv run python scripts/create_experiment_manifest.py
 
+dashboard:
+	uv run python scripts/create_research_dashboard.py
+
