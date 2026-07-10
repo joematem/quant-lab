@@ -63,3 +63,6 @@ dashboard:
 decision-gate:
 	uv run python scripts/create_strategy_decision_gate.py
 
+risk-limits:
+	uv run python scripts/create_risk_limits_report.py
+
