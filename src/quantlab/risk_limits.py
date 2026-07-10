@@ -23,6 +23,7 @@ def evaluate_research_risk_limits(
     portfolio_summary: pd.DataFrame,
     monte_carlo_summary: pd.DataFrame,
     decision_gate: dict[str, Any],
+    strategy_ticker: str = "equal_weight_sma",
     limits: dict[str, float] | None = None,
 ) -> dict[str, Any]:
     """Evaluate research risk limits for strategy eligibility."""
@@ -53,7 +54,16 @@ def evaluate_research_risk_limits(
     if limits is not None:
         active_limits.update(limits)
 
-    strategy_row = portfolio_summary.iloc[0]
+    matching_strategy = portfolio_summary[
+        portfolio_summary["ticker"] == strategy_ticker
+    ]
+
+    if matching_strategy.empty:
+        raise ValueError(
+            f"Strategy ticker not found in portfolio_summary: {strategy_ticker}"
+        )
+
+    strategy_row = matching_strategy.iloc[0]
     monte_carlo_row = monte_carlo_summary.iloc[0]
 
     observed = {

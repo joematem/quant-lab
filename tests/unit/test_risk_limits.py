@@ -13,9 +13,9 @@ from quantlab.risk_limits import (
 def sample_portfolio_summary() -> pd.DataFrame:
     return pd.DataFrame(
         {
-            "ticker": ["equal_weight_sma"],
-            "max_drawdown": [-0.20],
-            "sharpe_ratio": [0.80],
+            "ticker": ["equal_weight_buy_hold", "equal_weight_sma"],
+            "max_drawdown": [-0.50, -0.20],
+            "sharpe_ratio": [1.20, 0.80],
         }
     )
 
@@ -60,6 +60,7 @@ def test_evaluate_research_risk_limits_passes_when_all_checks_pass():
     assert report["research_status"] == "RISK_LIMITS_PASS_FOR_PAPER_REVIEW"
     assert report["paper_trading_allowed"] is True
     assert report["live_trading_allowed"] is False
+    assert report["observed"]["portfolio_ticker"] == "equal_weight_sma"
 
 
 def test_evaluate_research_risk_limits_fails_when_decision_gate_blocks_paper():
@@ -98,3 +99,13 @@ def test_write_risk_limits_outputs_files(tmp_path: Path):
     assert json_path.exists()
     assert markdown_path.exists()
     assert "Research Risk Limits Report" in markdown_path.read_text()
+
+
+def test_evaluate_research_risk_limits_rejects_missing_strategy_ticker():
+    with pytest.raises(ValueError, match="Strategy ticker not found"):
+        evaluate_research_risk_limits(
+            portfolio_summary=sample_portfolio_summary(),
+            monte_carlo_summary=sample_monte_carlo_summary(),
+            decision_gate=sample_decision_gate(),
+            strategy_ticker="missing_strategy",
+        )
