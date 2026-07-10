@@ -263,3 +263,38 @@ def plot_transaction_cost_stress(
     plt.close(fig)
 
     return output_path
+
+
+def plot_monte_carlo_distribution(
+    monte_carlo_results: pd.DataFrame,
+    metric: str,
+    output_path: Path,
+    bins: int = 40,
+) -> Path:
+    """Plot Monte Carlo distribution for a selected metric."""
+    required_columns = {"ticker", metric}
+    missing = required_columns - set(monte_carlo_results.columns)
+    if missing:
+        raise ValueError(f"Missing required columns: {sorted(missing)}")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    values = monte_carlo_results[metric].dropna()
+
+    if values.empty:
+        raise ValueError(f"No valid values found for metric: {metric}")
+
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    ax.hist(values, bins=bins)
+
+    ax.set_title(f"Monte Carlo Distribution: {metric.replace('_', ' ').title()}")
+    ax.set_xlabel(metric.replace("_", " ").title())
+    ax.set_ylabel("Frequency")
+    ax.grid(True)
+
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+
+    return output_path

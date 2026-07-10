@@ -41,6 +41,7 @@ cost-stress:
 
 monte-carlo:
 	uv run python scripts/run_monte_carlo_portfolio.py --simulations 1000 --seed 42
+	uv run python scripts/create_monte_carlo_charts.py
 
 sync-check:
 	git status
